@@ -1,8 +1,8 @@
 {
-  "name": "zingmp3-proxy-player",
+  "name": "zingmp3-api-ui",
   "version": "1.0.0",
   "main": "api/index.js",
-  "license": "MIT",
+  "type": "commonjs",
   "dependencies": {
     "express": "^4.18.2",
     "zingmp3-api-full": "^1.0.8",
