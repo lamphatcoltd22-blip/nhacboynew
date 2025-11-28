@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZingMp3 Player - Vercel</title>
+    <style>
+        body { font-family: sans-serif; background: #0f172a; color: #fff; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .box { background: #1e293b; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        input { width: 70%; padding: 10px; border-radius: 6px; border: none; background: #334155; color: white; }
+        button { padding: 10px 20px; border-radius: 6px; border: none; background: #3b82f6; color: white; cursor: pointer; font-weight: bold; }
+        button:hover { background: #2563eb; }
+        ul { list-style: none; padding: 0; }
+        li { background: #334155; padding: 10px; margin: 5px 0; border-radius: 6px; cursor: pointer; display: flex; justify-content: space-between; }
+        li:hover { background: #475569; }
+        audio { width: 100%; margin-top: 15px; }
+        .playing-info { color: #60a5fa; margin-bottom: 10px; font-weight: bold; font-size: 1.1em; }
+        .err-msg { color: #f87171; margin-top: 10px; display: none; }
+        .backup-link { display: block; margin-top: 10px; color: #94a3b8; font-size: 0.9em; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <h1>🎵 ZingMp3 API Player</h1>
+
+    <div class="box">
+        <div style="display: flex; gap: 10px;">
+            <input type="text" id="keyword" placeholder="Nhập tên bài hát (VD: Sơn Tùng)..." onkeypress="handleEnter(event)">
+            <button onclick="searchSong()">Tìm</button>
+        </div>
+        <ul id="resultList"></ul>
+    </div>
+
+    <div class="box" id="playerBox" style="display:none;">
+        <div class="playing-info" id="nowPlaying">Đang tải...</div>
+        <div id="artistName" style="color: #94a3b8; margin-bottom: 10px;"></div>
+        
+        <audio id="audioPlayer" controls autoplay crossorigin="anonymous"></audio>
+        
+        <div id="errorMsg" class="err-msg"></div>
+        <a id="directLink" href="#" target="_blank" class="backup-link">🔗 Mở link gốc (nếu player lỗi)</a>
+        
+        <div style="margin-top: 15px; border-top: 1px solid #334155; padding-top: 10px;">
+            <button onclick="getLyric()" style="background: #4b5563; font-size: 0.8em;">Xem Lời bài hát</button>
+            <pre id="lyricBox" style="margin-top:10px; white-space: pre-wrap; color: #cbd5e1; font-size: 0.9em;"></pre>
+        </div>
+    </div>
+
+    <script>
+        let currentId = '';
+
+        function handleEnter(e) { if(e.key === 'Enter') searchSong(); }
+
+        // 1. TÌM KIẾM
+        async function searchSong() {
+            const kw = document.getElementById('keyword').value;
+            if(!kw) return alert('Nhập từ khóa!');
+            
+            document.getElementById('resultList').innerHTML = '<div style="padding:10px;">⏳ Đang tìm...</div>';
+            
+            try {
+                const res = await fetch(`/api/search?q=${encodeURIComponent(kw)}`);
+                const data = await res.json();
+                const songs = data.data.items || []; // Zing trả về data.items hoặc data.songs tùy endpoint
+
+                const list = document.getElementById('resultList');
+                list.innerHTML = '';
+
+                if(songs.length === 0) {
+                    list.innerHTML = '<div style="padding:10px;">Không tìm thấy bài nào.</div>';
+                    return;
+                }
+
+                songs.forEach(song => {
+                    if(!song.encodeId) return;
+                    const li = document.createElement('li');
+                    li.innerHTML = `<span>${song.title}</span> <small>${song.artistsNames}</small>`;
+                    li.onclick = () => playSong(song.encodeId, song.title, song.artistsNames);
+                    list.appendChild(li);
+                });
+            } catch (e) {
+                document.getElementById('resultList').innerHTML = 'Lỗi tìm kiếm: ' + e.message;
+            }
+        }
+
+        // 2. PHÁT NHẠC
+        function playSong(id, title, artist) {
+            currentId = id;
+            document.getElementById('playerBox').style.display = 'block';
+            document.getElementById('nowPlaying').innerText = "🎵 " + title;
+            document.getElementById('artistName').innerText = "🎤 " + artist;
+            document.getElementById('errorMsg').style.display = 'none';
+            document.getElementById('lyricBox').innerText = '';
+
+            const player = document.getElementById('audioPlayer');
+            const streamUrl = `/api/stream?id=${id}`;
+            
+            // Set source và xử lý lỗi
+            player.src = streamUrl;
+            player.load();
+            
+            // Link dự phòng
+            const linkTag = document.getElementById('directLink');
+            linkTag.href = `/api/stream?id=${id}&redirect=true`;
+            linkTag.innerText = "🔗 Mở link gốc (Click nếu không nghe được)";
+
+            // Bắt lỗi Audio
+            player.onerror = function() {
+                const err = player.error;
+                let msg = "Lỗi phát nhạc.";
+                if(err.code === 4) msg = "Không thể tải stream (Có thể là bài VIP hoặc lỗi mạng).";
+                
+                const errDiv = document.getElementById('errorMsg');
+                errDiv.innerText = `❌ ${msg} (Code: ${err.code})`;
+                errDiv.style.display = 'block';
+            };
+        }
+
+        // 3. LẤY LỜI BÀI HÁT
+        async function getLyric() {
+            if(!currentId) return;
+            const box = document.getElementById('lyricBox');
+            box.innerText = "Đang tải lời...";
+            
+            try {
+                const res = await fetch(`/api/lyric?id=${currentId}`);
+                const json = await res.json();
+                
+                if(json.data && json.data.file) {
+                    // Fetch file .lrc
+                    const lrcRes = await fetch(json.data.file);
+                    const lrcText = await lrcRes.text();
+                    // Lọc bỏ timecode [00:00.00] để lấy lời
+                    const cleanText = lrcText.replace(/\[.*?\]/g, '').trim();
+                    box.innerText = cleanText || "Không có nội dung lời.";
+                } else {
+                    box.innerText = "Không tìm thấy lời bài hát.";
+                }
+            } catch (e) {
+                box.innerText = "Lỗi tải lời: " + e.message;
+            }
+        }
+    </script>
+</body>
+</html>
