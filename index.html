@@ -3,150 +3,59 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ZingMp3 API - Nghe nhạc Online</title>
+  <title>ZingMp3 Player API</title>
   <style>
+    /* Giữ lại giao diện đẹp */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { 
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; 
+      font-family: system-ui, -apple-system, sans-serif; 
       background: linear-gradient(135deg, #0b1020 0%, #1a1f3a 100%); 
       color: #e5e7eb; 
       padding: 20px;
       min-height: 100vh;
     }
-    .container { max-width: 1200px; margin: 0 auto; }
-    h1 { margin: 0 0 24px; font-size: 28px; color: #60a5fa; text-align: center; }
+    .container { max-width: 1000px; margin: 0 auto; }
+    h1 { margin-bottom: 24px; color: #60a5fa; text-align: center; }
     .card { 
-      background: linear-gradient(135deg, #111827 0%, #1f2937 100%); 
+      background: #111827; 
       border: 1px solid #374151; 
-      border-radius: 16px; 
-      padding: 24px; 
+      border-radius: 12px; 
+      padding: 20px; 
       margin-bottom: 20px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
     }
-    label { display: block; margin-bottom: 8px; color: #93c5fd; font-weight: 500; }
+    .group-title { color: #fcd34d; font-weight: 700; margin-bottom: 12px; border-bottom: 1px solid #374151; padding-bottom: 8px; }
+    label { display: block; margin-bottom: 6px; color: #93c5fd; font-size: 14px; }
     input[type="text"] { 
-      width: 100%; 
-      padding: 12px 16px; 
-      border-radius: 10px; 
-      border: 1px solid #374151; 
-      background: #0f172a; 
-      color: #e5e7eb;
-      font-size: 14px;
-      transition: border 0.3s;
-    }
-    input[type="text"]:focus {
-      outline: none;
-      border-color: #2563eb;
+      width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #374151; 
+      background: #0f172a; color: white; margin-bottom: 10px;
     }
     button { 
-      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); 
-      color: white; 
-      border: 0; 
-      border-radius: 10px; 
-      padding: 12px 20px; 
-      cursor: pointer;
-      font-weight: 600;
-      transition: transform 0.2s, box-shadow 0.2s;
-      font-size: 14px;
+      background: #2563eb; color: white; border: none; border-radius: 8px; 
+      padding: 10px 16px; cursor: pointer; font-weight: 600; transition: 0.2s;
     }
-    button:hover { 
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
-    }
-    button:active {
-      transform: translateY(0);
-    }
-    button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-    }
-    .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; align-items: end; }
+    button:hover { background: #1d4ed8; transform: translateY(-1px); }
+    .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
+    .w-full { width: 100%; }
     pre { 
-      background: #0f172a; 
-      color: #d1d5db; 
-      padding: 16px; 
-      border-radius: 12px; 
-      overflow: auto; 
-      max-height: 400px;
-      font-size: 13px;
-      line-height: 1.6;
-      border: 1px solid #1f2937;
+      background: #0f172a; color: #d1d5db; padding: 15px; border-radius: 8px; 
+      overflow: auto; max-height: 400px; font-size: 13px; font-family: monospace;
     }
-    .group-title { 
-      color: #fcd34d; 
-      font-weight: 700; 
-      margin-bottom: 16px; 
-      font-size: 18px;
-      border-bottom: 2px solid #374151;
-      padding-bottom: 8px;
-    }
-    audio { 
-      width: 100%; 
-      margin-top: 16px;
-      border-radius: 10px;
-      background: #0f172a;
-    }
+    audio { width: 100%; margin-top: 15px; border-radius: 8px; }
     .hidden { display: none; }
-    #direct128 { 
-      color: #60a5fa; 
-      word-break: break-all;
-      display: inline-block;
-      margin-top: 12px;
-      padding: 10px;
-      background: #0f172a;
-      border-radius: 8px;
-      text-decoration: none;
-      font-size: 12px;
-    }
-    #direct128:hover {
-      color: #93c5fd;
-      background: #1e293b;
-    }
-    small { 
-      color: #9ca3af; 
-      display: block; 
-      margin-top: 8px;
-      font-size: 12px;
-    }
-    .player-info {
-      background: #1e293b;
-      padding: 12px;
-      border-radius: 8px;
-      margin-top: 12px;
-      font-size: 14px;
-    }
-    .player-info h3 {
-      color: #60a5fa;
-      margin-bottom: 6px;
-      font-size: 16px;
-    }
-    .error {
-      background: #7f1d1d;
-      color: #fecaca;
-      padding: 12px;
-      border-radius: 8px;
-      margin-top: 12px;
-    }
-    .success {
-      background: #14532d;
-      color: #86efac;
-      padding: 12px;
-      border-radius: 8px;
-      margin-top: 12px;
-    }
+    .link-display { color: #10b981; font-size: 13px; margin-top: 10px; word-break: break-all; display: block; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>🎵 ZingMp3 API - Nghe nhạc Online</h1>
+    <h1>🎵 ZingMp3 API Player</h1>
 
     <div class="card">
-      <div class="group-title">Tìm kiếm bài hát</div>
+      <div class="group-title">1. Tìm kiếm bài hát</div>
       <div class="row">
-        <div>
-          <label>Tên bài hát, ca sĩ...</label>
-          <input id="kw" type="text" placeholder="Ví dụ: lạc trôi, sơn tùng..." />
+        <div style="flex-grow: 1;">
+          <label>Nhập tên bài hát / ca sĩ:</label>
+          <input id="kw" type="text" placeholder="Ví dụ: Sơn Tùng MTP, Lạc Trôi..." />
         </div>
         <div>
           <button id="btnSearchV2">🔍 Tìm kiếm</button>
@@ -155,57 +64,40 @@
     </div>
 
     <div class="card">
-      <div class="group-title">Phát nhạc theo Song ID</div>
+      <div class="group-title">2. Phát nhạc (Song ID)</div>
       <div class="row">
-        <div>
-          <label>Song ID</label>
+        <div style="flex-grow: 1;">
+          <label>Song ID (Tự động điền khi tìm kiếm):</label>
           <input id="songId" type="text" placeholder="Ví dụ: ZOACFBBU" />
         </div>
-        <div style="display:flex; gap:8px; flex-wrap: wrap;">
-          <button id="btnPlay">▶️ Phát nhạc</button>
-          <button id="btnGetLink">🔗 Link Stream</button>
-          <button id="btnInfoSong">ℹ️ Thông tin</button>
-          <button id="btnLyric">📝 Lời bài hát</button>
+      </div>
+      <div class="row" style="margin-top: 10px;">
+        <button id="btnPlay">▶️ Phát nhạc</button>
+        <button id="btnGetLink" style="background: #4b5563">🔗 Link Stream</button>
+        <button id="btnInfoSong" style="background: #4b5563">ℹ️ Thông tin</button>
+        <button id="btnLyric" style="background: #4b5563">📝 Lời bài hát</button>
+      </div>
+
+      <div id="playerContainer" class="hidden">
+        <audio id="player" controls autoplay></audio>
+        <a id="direct128" class="link-display" target="_blank"></a>
+        <div style="margin-top:5px; font-size: 12px; color: #9ca3af;">
+          *Server đang proxy stream để vượt qua chặn quốc gia.
         </div>
       </div>
-      
-      <div id="playerSection" class="hidden">
-        <div class="player-info">
-          <h3 id="nowPlaying">Đang phát...</h3>
-        </div>
-        <audio id="player" controls></audio>
-        <a id="direct128" class="hidden" target="_blank" rel="noreferrer noopener">🔗 Link phát trực tiếp</a>
-        <small id="note128" class="hidden">Link stream nhạc. Click để mở trong tab mới.</small>
-      </div>
-      
-      <div id="errorMsg" class="error hidden"></div>
     </div>
 
     <div class="card">
-      <label>📊 Kết quả</label>
-      <pre id="out">(chưa có dữ liệu)</pre>
+      <div class="group-title">Kết quả trả về</div>
+      <pre id="out">(Chưa có dữ liệu)</pre>
     </div>
   </div>
 
   <script>
     const out = document.getElementById('out');
-    const player = document.getElementById('player');
-    const playerSection = document.getElementById('playerSection');
-    const direct128 = document.getElementById('direct128');
-    const note128 = document.getElementById('note128');
-    const nowPlaying = document.getElementById('nowPlaying');
-    const errorMsg = document.getElementById('errorMsg');
+    const setOut = (d) => out.textContent = typeof d === 'string' ? d : JSON.stringify(d, null, 2);
 
-    const setOut = (d) => {
-      out.textContent = typeof d === 'string' ? d : JSON.stringify(d, null, 2);
-    };
-
-    const showError = (msg) => {
-      errorMsg.textContent = msg;
-      errorMsg.classList.remove('hidden');
-      setTimeout(() => errorMsg.classList.add('hidden'), 5000);
-    };
-
+    // Helper: Lấy trường dữ liệu cần thiết cho gọn
     function pickSongFields(s) {
       return {
         encodeId: s?.encodeId,
@@ -215,222 +107,130 @@
       };
     }
 
+    // Hàm gọi API
     async function call(path, params) {
       const url = new URL(path, window.location.origin);
-      if (params) {
-        Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
-      }
+      if (params) Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
+      
       setOut('⏳ Đang tải...');
-      
-      console.log('Calling:', url.toString());
-      const res = await fetch(url);
-      console.log('Response status:', res.status);
-      
-      const text = await res.text();
-      console.log('Response text:', text);
-      
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}: ${text}`);
+      try {
+        const res = await fetch(url);
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(`Lỗi HTTP ${res.status}: ${text}`);
+        }
+        return await res.json();
+      } catch (e) {
+        throw e;
       }
-      
-      return JSON.parse(text);
     }
 
-    // Tìm kiếm theo từ khóa
+    // --- XỬ LÝ SỰ KIỆN ---
+
+    // 1. Tìm kiếm
     document.getElementById('btnSearchV2').onclick = async () => {
       const q = document.getElementById('kw').value.trim();
-      if (!q) {
-        setOut('⚠️ Vui lòng nhập từ khóa');
-        return;
-      }
-      
+      if (!q) return alert('Vui lòng nhập từ khóa!');
+
       try {
         const res = await call('/api/search', { q });
-        console.log('Search response:', res);
-        
         const songs = Array.isArray(res?.data?.songs) ? res.data.songs : [];
         const concise = songs.map(pickSongFields);
         
-        if (concise.length > 0 && concise[0]?.encodeId) {
-          const inp = document.getElementById('songId');
-          if (inp) inp.value = concise[0].encodeId;
-          setOut({ 
-            message: '✅ Tìm thấy ' + concise.length + ' bài hát. Song ID đầu tiên đã được điền tự động.',
-            total: concise.length, 
-            songs: concise 
-          });
-        } else {
-          setOut({ message: '❌ Không tìm thấy bài hát nào', total: 0 });
+        // Tự động điền ID bài đầu tiên vào ô nhập
+        if (concise.length > 0 && concise[0].encodeId) {
+          document.getElementById('songId').value = concise[0].encodeId;
         }
+
+        setOut({ 
+          msg: `Tìm thấy ${concise.length} bài hát.`,
+          top_result: concise 
+        });
       } catch (e) {
-        console.error('Search error:', e);
         setOut('❌ Lỗi: ' + String(e));
-        showError('Lỗi tìm kiếm: ' + e.message);
       }
     };
 
-    // Phát nhạc - Dùng proxy qua server
-    document.getElementById('btnPlay').onclick = async () => {
+    // Enter để tìm kiếm
+    document.getElementById('kw').addEventListener('keypress', (e) => {
+        if(e.key === 'Enter') document.getElementById('btnSearchV2').click();
+    });
+
+    // 2. Phát nhạc
+    const player = document.getElementById('player');
+    const playerContainer = document.getElementById('playerContainer');
+    const directLink = document.getElementById('direct128');
+
+    document.getElementById('btnPlay').onclick = () => {
       const id = document.getElementById('songId').value.trim();
-      if (!id) {
-        alert('⚠️ Vui lòng nhập Song ID');
-        return;
-      }
+      if (!id) return alert('Vui lòng nhập Song ID (hoặc tìm kiếm trước)');
+
+      // URL proxy stream của server
+      const streamUrl = `/api/song/stream?id=${encodeURIComponent(id)}`;
       
-      try {
-        // Bước 1: Lấy thông tin bài hát
-        console.log('Getting info for:', id);
-        const info = await call('/api/info-song', { id });
-        console.log('Info response:', info);
-        
-        const songTitle = info?.data?.title || 'Không rõ tên';
-        const artistName = info?.data?.artistsNames || 'Không rõ ca sĩ';
-        nowPlaying.textContent = `🎵 ${songTitle} - ${artistName}`;
-        
-        // Bước 2: Kiểm tra link có khả dụng không
-        console.log('Checking stream availability for:', id);
-        const linkData = await call('/api/song', { id });
-        console.log('Link data response:', linkData);
-        
-        // Kiểm tra lỗi geo-blocking
-        if (linkData.err && linkData.err !== 0) {
-          const errorMsg = linkData.msg || 'Không thể phát nhạc';
-          if (errorMsg.includes('quốc gia') || errorMsg.includes('geo')) {
-            showError('⚠️ Bài hát bị chặn theo vùng địa lý. Server đang proxy để vượt qua...');
-          } else {
-            showError('❌ ' + errorMsg);
-            setOut({ error: errorMsg, debug: linkData });
-            return;
-          }
-        }
-        
-        // Bước 3: Dùng proxy stream qua server
-        const proxyUrl = `/api/song/stream?id=${encodeURIComponent(id)}`;
-        console.log('Using proxy URL:', proxyUrl);
-        
-        // Hiển thị player
-        playerSection.classList.remove('hidden');
-        player.src = proxyUrl;
-        
-        // Thử phát
-        setTimeout(() => {
-          player.play().then(() => {
-            console.log('Playing successfully via proxy');
-            setOut({ 
-              message: '✅ Đang phát nhạc qua proxy server...',
-              songId: id,
-              proxyUrl: proxyUrl,
-              note: 'Server đang proxy stream để bypass geo-blocking'
-            });
-          }).catch(e => {
-            console.error('Play error:', e);
-            showError('Không thể phát nhạc: ' + e.message);
-            setOut({ 
-              error: 'Không thể phát',
-              detail: e.message,
-              proxyUrl: proxyUrl 
-            });
-          });
-        }, 100);
-        
-        // Hiển thị link proxy
-        direct128.href = proxyUrl;
-        direct128.textContent = '🔗 ' + proxyUrl;
-        direct128.classList.remove('hidden');
-        note128.textContent = 'Link stream qua proxy server. Click để mở trong tab mới.';
-        note128.classList.remove('hidden');
-        
-      } catch (e) {
-        console.error('Play error:', e);
-        showError('Lỗi: ' + e.message);
-        setOut('❌ Lỗi: ' + String(e));
-      }
+      // Hiển thị player
+      playerContainer.classList.remove('hidden');
+      
+      // Gán source và phát
+      player.src = streamUrl;
+      player.load();
+      player.play().catch(e => console.error("Auto-play blocked:", e));
+
+      // Hiển thị link
+      directLink.href = streamUrl;
+      directLink.textContent = `🔗 Link Stream trực tiếp: ${window.location.origin}${streamUrl}`;
+      
+      setOut(`▶️ Đang phát bài hát ID: ${id}\nLink: ${streamUrl}`);
     };
 
-    // Lấy link stream
+    // 3. Lấy Link JSON
     document.getElementById('btnGetLink').onclick = async () => {
       const id = document.getElementById('songId').value.trim();
-      if (!id) {
-        setOut('⚠️ Vui lòng nhập Song ID');
-        return;
-      }
-      
+      if (!id) return alert('Thiếu Song ID');
       try {
         const res = await call('/api/song', { id });
         setOut(res);
-      } catch (e) {
-        console.error('Get link error:', e);
-        setOut('❌ Lỗi: ' + String(e));
-        showError('Lỗi lấy link: ' + e.message);
-      }
+      } catch (e) { setOut(String(e)); }
     };
 
-    // Lấy thông tin bài hát
+    // 4. Lấy thông tin
     document.getElementById('btnInfoSong').onclick = async () => {
       const id = document.getElementById('songId').value.trim();
-      if (!id) {
-        setOut('⚠️ Vui lòng nhập Song ID');
-        return;
-      }
-      
+      if (!id) return alert('Thiếu Song ID');
       try {
         const res = await call('/api/info-song', { id });
         setOut(res);
-      } catch (e) {
-        console.error('Get info error:', e);
-        setOut('❌ Lỗi: ' + String(e));
-        showError('Lỗi lấy thông tin: ' + e.message);
-      }
+      } catch (e) { setOut(String(e)); }
     };
 
-    // Lấy lời bài hát
+    // 5. Lấy lời bài hát
     document.getElementById('btnLyric').onclick = async () => {
       const id = document.getElementById('songId').value.trim();
-      if (!id) {
-        setOut('⚠️ Vui lòng nhập Song ID');
-        return;
-      }
+      if (!id) return alert('Thiếu Song ID');
       
       try {
         const res = await call('/api/lyric', { id });
         const fileUrl = res?.data?.file;
         
-        if (fileUrl && typeof fileUrl === 'string') {
-          try {
-            const resp = await fetch(fileUrl);
-            const lrc = await resp.text();
-            const text = lrc
-              .split('\n')
-              .map(line => line.replace(/\s*\[[^\]]*\]\s*/g, '').trim())
-              .filter(Boolean)
-              .join('\n');
-            setOut(`📝 Lời bài hát:\n\nFile: ${fileUrl}\n\n${text}`);
-          } catch (err) {
-            console.error('Fetch lyric error:', err);
-            setOut(res);
-          }
+        if (fileUrl) {
+          // Fetch file lời bài hát
+          setOut('⏳ Đang tải file lời bài hát...');
+          const resp = await fetch(fileUrl);
+          const lrcText = await resp.text();
+          
+          // Lọc bỏ timestamp [00:00.00] để dễ đọc
+          const cleanText = lrcText
+            .split('\n')
+            .map(line => line.replace(/\[.*?\]/g, '').trim())
+            .filter(line => line)
+            .join('\n');
+
+          setOut(`📝 Lời bài hát:\n\n${cleanText}`);
         } else {
           setOut(res);
         }
-      } catch (e) {
-        console.error('Get lyric error:', e);
-        setOut('❌ Lỗi: ' + String(e));
-        showError('Lỗi lấy lời bài hát: ' + e.message);
-      }
+      } catch (e) { setOut(String(e)); }
     };
-
-    // Xử lý Enter key cho search
-    document.getElementById('kw').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        document.getElementById('btnSearchV2').click();
-      }
-    });
-    
-    document.getElementById('songId').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        document.getElementById('btnPlay').click();
-      }
-    });
   </script>
 </body>
 </html>
